@@ -16,7 +16,7 @@ jobs:
 
     defaults:
       run:
-        working-directory: ./CISE_Repos/worksheet2/my-react-app 
+        working-directory: worksheet2/my-react-app
 
     steps:
     - name: Checkout repository
