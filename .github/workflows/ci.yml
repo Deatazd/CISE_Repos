@@ -9,18 +9,31 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+
     strategy:
       matrix:
-        node-version: [12.x]
+        node-version: [14.x] 
+
+    defaults:
+      run:
+        working-directory: ./CISE_Repos/worksheet2/my-react-app 
 
     steps:
     - name: Checkout repository
       uses: actions/checkout@v2
 
     - name: Set up Node.js ${{ matrix.node-version }}
-      uses: actions/setup-node@v1
+      uses: actions/setup-node@v2  
       with:
         node-version: ${{ matrix.node-version }}
+
+    - name: Cache node modules  
+      uses: actions/cache@v2
+      with:
+        path: ~/.npm
+        key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+        restore-keys: |
+          ${{ runner.os }}-node-
 
     - name: Install dependencies
       run: npm install
@@ -30,4 +43,3 @@ jobs:
 
     - name: Build
       run: npm run build
-
