@@ -1,6 +1,5 @@
 import { GetStaticProps, NextPage } from "next";
-import SortableTable from "../../components/table/SortableTable";
-import data from "../../utils/dummydata";
+import SortableTable from "../../components/table/SortableTable"; // 确保路径正确
 
 interface ArticlesInterface {
     id: string;
@@ -18,7 +17,7 @@ type ArticlesProps = {
 };
 
 const Articles: NextPage<ArticlesProps> = ({ articles }) => {
-    const headers: { key: keyof ArticlesInterface; label: string }[] = [
+    const headers = [
         { key: "title", label: "Title" },
         { key: "authors", label: "Authors" },
         { key: "source", label: "Source" },
@@ -37,24 +36,22 @@ const Articles: NextPage<ArticlesProps> = ({ articles }) => {
     );
 };
 
-export const getStaticProps: GetStaticProps<ArticlesProps> = async (_) => {
-    // Map the data to ensure all articles have consistent property names
-    const articles = data.map((article) => ({
-        id: article.id ?? article._id,
-        title: article.title,
-        authors: article.authors,
-        source: article.source,
-        pubyear: article.pubyear,
-        doi: article.doi,
-        claim: article.claim,
-        evidence: article.evidence,
-    }));
+export const getStaticProps: GetStaticProps<ArticlesProps> = async () => {
+    // 使用环境变量来构建 API 请求的 URL
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/articles`);
 
+    if (!res.ok) {
+        // 如果请求失败，抛出错误并在控制台中显示状态码
+        throw new Error(`Failed to fetch articles, status: ${res.status}`);
+    }
+
+    const articles: ArticlesInterface[] = await res.json();
 
     return {
         props: {
             articles,
         },
+        revalidate: 60, // 每 60 秒重新验证数据
     };
 };
 
